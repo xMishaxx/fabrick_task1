@@ -63,32 +63,6 @@ class AsteroidControllerTest {
     }
 
     @Test
-    void getAsteroidPaths_WithFromDateInFuture_ShouldThrowException() {
-        int asteroidId = 123;
-        LocalDate fromDate = LocalDate.now().plusDays(1);
-        LocalDate toDate = LocalDate.now().plusDays(10);
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            asteroidController.getAsteroidPaths(asteroidId, fromDate, toDate);
-        });
-
-        assertEquals("fromDate cannot be in the future", exception.getMessage());
-    }
-
-    @Test
-    void getAsteroidPaths_WithToDateInFuture_ShouldThrowException() {
-        int asteroidId = 123;
-        LocalDate fromDate = LocalDate.now().minusDays(10);
-        LocalDate toDate = LocalDate.now().plusDays(1);
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            asteroidController.getAsteroidPaths(asteroidId, fromDate, toDate);
-        });
-
-        assertEquals("toDate cannot be in the future", exception.getMessage());
-    }
-
-    @Test
     void getAsteroidPaths_WithNullDates_ShouldUseDefaults() {
         // Arrange
         int asteroidId = 123;

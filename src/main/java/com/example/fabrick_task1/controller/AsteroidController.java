@@ -53,13 +53,5 @@ public class AsteroidController {
         if (fromDate.isAfter(toDate)) {
             throw new IllegalArgumentException("fromDate cannot be after toDate");
         }
-
-        if (fromDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("fromDate cannot be in the future");
-        }
-
-        if (toDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("toDate cannot be in the future");
-        }
     }
 }
