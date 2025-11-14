@@ -9,6 +9,12 @@ spring:
   main:
     web-application-type: servlet
 
+application:
+  nasa:
+    api:
+      base-url: https://api.nasa.gov/neo/rest/v1/neo
+      api-key: DEMO_KEY #todo: only because it's a public demo api, otherwise it must be configured in a secure place
+
 logging:
   level:
     com.example.fabrick_task1: DEBUG

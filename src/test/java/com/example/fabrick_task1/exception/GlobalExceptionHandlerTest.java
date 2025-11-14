@@ -72,6 +72,54 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void handleNasaApiException_ShouldReturnProvidedHttpStatus() {
+        NasaApiException exception = new NasaApiException("NASA API returned error: 503", HttpStatus.SERVICE_UNAVAILABLE);
+
+        ResponseEntity<Object> response = globalExceptionHandler.handleNasaApiException(exception, webRequest);
+
+        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        assertEquals(HttpStatus.SERVICE_UNAVAILABLE.value(), body.get("status"));
+        assertEquals("Service Unavailable", body.get("error"));
+        assertEquals("NASA API returned error: 503", body.get("message"));
+        assertEquals("/api/test", body.get("path"));
+        assertNotNull(body.get("timestamp"));
+    }
+
+    @Test
+    void handleNasaApiException_WithBadGateway_ShouldReturnBadGateway() {
+        NasaApiException exception = new NasaApiException("Unexpected error while fetching asteroid data", HttpStatus.BAD_GATEWAY);
+
+        ResponseEntity<Object> response = globalExceptionHandler.handleNasaApiException(exception, webRequest);
+
+        assertEquals(HttpStatus.BAD_GATEWAY, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        assertEquals(HttpStatus.BAD_GATEWAY.value(), body.get("status"));
+        assertEquals("Bad Gateway", body.get("error"));
+        assertTrue(((String) body.get("message")).contains("Unexpected error"));
+        assertEquals("/api/test", body.get("path"));
+        assertNotNull(body.get("timestamp"));
+    }
+
+    @Test
+    void handleNasaApiException_WithNullHttpStatus_ShouldReturnBadGateway() {
+        NasaApiException exception = new NasaApiException("Error with null status", null);
+
+        ResponseEntity<Object> response = globalExceptionHandler.handleNasaApiException(exception, webRequest);
+
+        assertEquals(HttpStatus.BAD_GATEWAY, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        assertEquals(HttpStatus.BAD_GATEWAY.value(), body.get("status"));
+        assertEquals("Bad Gateway", body.get("error"));
+    }
+
+    @Test
     void handleGlobalException_ShouldReturnInternalServerError() {
         Exception exception = new RuntimeException("Unexpected error");
 
