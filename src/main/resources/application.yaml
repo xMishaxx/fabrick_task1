@@ -1,3 +1,17 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
 spring:
   application:
     name: fabrick_task1
+  main:
+    web-application-type: servlet
+
+logging:
+  level:
+    com.example.fabrick_task1: DEBUG
+    org.springframework.web.client: DEBUG
+  pattern:
+    level: "%5p [%spring.application.name]"
