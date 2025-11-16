@@ -2,6 +2,14 @@ package com.example.fabrick_task1.controller;
 
 import com.example.fabrick_task1.model.AsteroidPath;
 import com.example.fabrick_task1.service.AsteroidService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,6 +22,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/fabrick/v1.0")
+@Tag(name = "Asteroid API", description = "API for retrieving asteroid path information from NASA")
 public class AsteroidController {
 
     private final AsteroidService asteroidService;
@@ -24,10 +33,50 @@ public class AsteroidController {
     }
 
 
+    @Operation(
+            summary = "Get asteroid paths",
+            description = "Retrieves the list of paths for a specific asteroid between two dates. " +
+                    "If fromDate is not provided, defaults to 100 years ago. " +
+                    "If toDate is not provided, defaults to today."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved asteroid paths",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = AsteroidPath.class))
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad request - Invalid parameters (e.g., fromDate after toDate, invalid date format)",
+                    content = @Content(
+                            mediaType = "application/json"
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "502",
+                    description = "Bad Gateway - Error communicating with NASA API",
+                    content = @Content(
+                            mediaType = "application/json"
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(
+                            mediaType = "application/json"
+                    )
+            )
+    })
     @GetMapping("/asteroids/{asteroidId}/paths")
     public ResponseEntity<List<AsteroidPath>> getAsteroidPaths(
+            @Parameter(description = "The unique identifier of the asteroid", required = true, example = "3542519")
             @PathVariable int asteroidId,
+            @Parameter(description = "Start date for path search (format: yyyy-MM-dd). Defaults to 100 years ago if not provided.", example = "2000-01-01")
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+            @Parameter(description = "End date for path search (format: yyyy-MM-dd). Defaults to today if not provided.", example = "2025-12-31")
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate) {
 
         log.info("Fetching asteroid paths for asteroidId: {}, fromDate: {}, toDate: {}",
