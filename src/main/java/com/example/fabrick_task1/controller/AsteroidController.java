@@ -1,6 +1,7 @@
 package com.example.fabrick_task1.controller;
 
 import com.example.fabrick_task1.model.AsteroidPath;
+import com.example.fabrick_task1.model.ErrorResponse;
 import com.example.fabrick_task1.service.AsteroidService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,21 +53,24 @@ public class AsteroidController {
                     responseCode = "400",
                     description = "Bad request - Invalid parameters (e.g., fromDate after toDate, invalid date format)",
                     content = @Content(
-                            mediaType = "application/json"
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
                     )
             ),
             @ApiResponse(
                     responseCode = "502",
                     description = "Bad Gateway - Error communicating with NASA API",
                     content = @Content(
-                            mediaType = "application/json"
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
                     )
             ),
             @ApiResponse(
                     responseCode = "500",
                     description = "Internal server error",
                     content = @Content(
-                            mediaType = "application/json"
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
                     )
             )
     })
