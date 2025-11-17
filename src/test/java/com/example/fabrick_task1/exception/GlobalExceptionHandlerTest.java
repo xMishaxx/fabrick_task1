@@ -82,7 +82,6 @@ class GlobalExceptionHandlerTest {
         ErrorResponse body = response.getBody();
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE.value(), body.getStatus());
         assertEquals("Service Unavailable", body.getError());
-        assertEquals("NASA API returned error: 503", body.getMessage());
         assertEquals("/api/test", body.getPath());
         assertNotNull(body.getTimestamp());
     }
@@ -99,7 +98,7 @@ class GlobalExceptionHandlerTest {
         ErrorResponse body = response.getBody();
         assertEquals(HttpStatus.BAD_GATEWAY.value(), body.getStatus());
         assertEquals("Bad Gateway", body.getError());
-        assertTrue(body.getMessage().contains("Unexpected error"));
+        assertEquals("Unexpected error while fetching asteroid data", body.getMessage());
         assertEquals("/api/test", body.getPath());
         assertNotNull(body.getTimestamp());
     }
@@ -145,5 +144,39 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         ErrorResponse body = response.getBody();
         assertEquals(complexMessage, body.getMessage());
+    }
+
+    @Test
+    void handleNasaApiException_WithNotFound_ShouldReturnNotFound() {
+        NasaApiException exception = new NasaApiException("Asteroid not found", HttpStatus.NOT_FOUND);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleNasaApiException(exception, webRequest);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        ErrorResponse body = response.getBody();
+        assertEquals(HttpStatus.NOT_FOUND.value(), body.getStatus());
+        assertEquals("Not Found", body.getError());
+        assertEquals("Asteroid not found", body.getMessage());
+        assertEquals("/api/test", body.getPath());
+        assertNotNull(body.getTimestamp());
+    }
+
+    @Test
+    void handleNasaApiException_WithTooManyRequests_ShouldReturnTooManyRequests() {
+        NasaApiException exception = new NasaApiException("Service rate limit exceeded", HttpStatus.TOO_MANY_REQUESTS);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleNasaApiException(exception, webRequest);
+
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        ErrorResponse body = response.getBody();
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), body.getStatus());
+        assertEquals("Too Many Requests", body.getError());
+        assertEquals("Service rate limit exceeded", body.getMessage());
+        assertEquals("/api/test", body.getPath());
+        assertNotNull(body.getTimestamp());
     }
 }

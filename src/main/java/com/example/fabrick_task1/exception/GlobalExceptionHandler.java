@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException ex, WebRequest request) {
 
-        log.error("Type mismatch error: {}", ex.getMessage());
+        log.error("Type mismatch error: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
             IllegalArgumentException ex, WebRequest request) {
 
-        log.error("Illegal argument error: {}", ex.getMessage());
+        log.error("Illegal argument error: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
@@ -56,10 +56,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNasaApiException(
             NasaApiException ex, WebRequest request) {
 
-        log.error("NASA API error: {} (status: {})", ex.getMessage(), ex.getHttpStatus());
+        log.error("NASA API error: {} (status: {})", ex.getMessage(), ex.getHttpStatus(), ex);
 
         HttpStatus status = ex.getHttpStatus() != null ? ex.getHttpStatus() : HttpStatus.BAD_GATEWAY;
-
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 status.value(),
@@ -67,7 +66,6 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false).replace("uri=", "")
         );
-
         return new ResponseEntity<>(errorResponse, status);
     }
 

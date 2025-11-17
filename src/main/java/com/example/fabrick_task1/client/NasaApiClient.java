@@ -37,12 +37,22 @@ public class NasaApiClient {
             log.info("Successfully fetched data from NASA API for asteroidId: {}", asteroidId);
             return response;
 
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
-            log.error("NASA API error for asteroidId {}: {} - {}", asteroidId, e.getStatusCode(), e.getMessage());
-            throw new NasaApiException("NASA API returned error: " + e.getStatusCode().value(), HttpStatus.valueOf(e.getStatusCode().value()), e);
+        } catch (HttpClientErrorException e) {
+            log.error("NASA API client error for asteroidId {}: {} - {}", asteroidId, e.getStatusCode(), e.getMessage(), e);
+
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new NasaApiException("Asteroid not found", HttpStatus.NOT_FOUND, e);
+            } else if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+                throw new NasaApiException("Service rate limit exceeded", HttpStatus.TOO_MANY_REQUESTS, e);
+            } else {
+                throw new NasaApiException("Unable to retrieve asteroid data", HttpStatus.BAD_GATEWAY, e);
+            }
+        } catch (HttpServerErrorException e) {
+            log.error("NASA API server error for asteroidId {}: {} - {}", asteroidId, e.getStatusCode(), e.getMessage(), e);
+            throw new NasaApiException("Unable to retrieve asteroid data", HttpStatus.BAD_GATEWAY, e);
         } catch (Exception e) {
             log.error("Unexpected error calling NASA API for asteroidId: {}", asteroidId, e);
-            throw new NasaApiException("Unexpected error while fetching asteroid data: " + e.getMessage(), HttpStatus.BAD_GATEWAY, e);
+            throw new NasaApiException("Unable to retrieve asteroid data", HttpStatus.BAD_GATEWAY, e);
         }
     }
 }

@@ -60,7 +60,7 @@ public class ExternalApiLoggingAspect {
                     String responseBody = objectMapper.writeValueAsString(response);
                     log.info("Response Body: {}", responseBody);
                 } catch (Exception e) {
-                    log.warn("Unable to serialize response body: {}", e.getMessage());
+                    log.warn("Unable to serialize response body: {}", e.getMessage(), e);
                     log.info("Response: {}", response);
                 }
             }
