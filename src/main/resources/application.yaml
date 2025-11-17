@@ -8,6 +8,11 @@ spring:
     name: fabrick_task1
   main:
     web-application-type: servlet
+  cache:
+    type: caffeine
+    caffeine:
+      maximum-size: 1000
+      expire-after-write: 86400000 # 24 hours in milliseconds
 
 application:
   nasa:
@@ -19,5 +24,7 @@ logging:
   level:
     com.example.fabrick_task1: DEBUG
     org.springframework.web.client: DEBUG
+    org.springframework.cache: TRACE
+    com.github.benmanes.caffeine: DEBUG
   pattern:
     level: "%5p [%spring.application.name]"

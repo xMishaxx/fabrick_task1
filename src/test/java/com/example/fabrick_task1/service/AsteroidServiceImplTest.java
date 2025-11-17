@@ -1,46 +1,31 @@
 package com.example.fabrick_task1.service;
 
-import com.example.fabrick_task1.config.NasaApiProperties;
+import com.example.fabrick_task1.client.NasaApiClient;
 import com.example.fabrick_task1.exception.NasaApiException;
 import com.example.fabrick_task1.model.AsteroidPath;
 import com.example.fabrick_task1.model.CloseApproachData;
 import com.example.fabrick_task1.model.NasaAsteroidResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AsteroidServiceImplTest {
 
     @Mock
-    private RestTemplate restTemplate;
-
-    @Mock
-    private NasaApiProperties nasaApiProperties;
+    private NasaApiClient nasaApiClient;
 
     @InjectMocks
     private AsteroidServiceImpl asteroidService;
-
-    @BeforeEach
-    void setUp() {
-        when(nasaApiProperties.getBaseUrl()).thenReturn("https://api.nasa.gov/neo/rest/v1/neo");
-        when(nasaApiProperties.getApiKey()).thenReturn("DEMO_KEY");
-    }
 
     @Test
     void getAsteroidPaths_WithValidData_ShouldReturnPaths() {
@@ -50,7 +35,7 @@ class AsteroidServiceImplTest {
         LocalDate toDate = LocalDate.of(2020, 12, 31);
 
         NasaAsteroidResponse mockResponse = createMockResponse();
-        when(restTemplate.getForObject(anyString(), eq(NasaAsteroidResponse.class)))
+        when(nasaApiClient.getAsteroidData(asteroidId))
                 .thenReturn(mockResponse);
 
         // Act
@@ -88,7 +73,7 @@ class AsteroidServiceImplTest {
 
         mockResponse.setCloseApproachData(approaches);
 
-        when(restTemplate.getForObject(anyString(), eq(NasaAsteroidResponse.class)))
+        when(nasaApiClient.getAsteroidData(asteroidId))
                 .thenReturn(mockResponse);
 
         // Act
@@ -132,7 +117,7 @@ class AsteroidServiceImplTest {
 
         mockResponse.setCloseApproachData(approaches);
 
-        when(restTemplate.getForObject(anyString(), eq(NasaAsteroidResponse.class)))
+        when(nasaApiClient.getAsteroidData(asteroidId))
                 .thenReturn(mockResponse);
 
         // Act
@@ -182,7 +167,7 @@ class AsteroidServiceImplTest {
 
         mockResponse.setCloseApproachData(approaches);
 
-        when(restTemplate.getForObject(anyString(), eq(NasaAsteroidResponse.class)))
+        when(nasaApiClient.getAsteroidData(asteroidId))
                 .thenReturn(mockResponse);
 
         // Act
@@ -201,7 +186,7 @@ class AsteroidServiceImplTest {
         LocalDate fromDate = LocalDate.of(2020, 1, 1);
         LocalDate toDate = LocalDate.of(2020, 12, 31);
 
-        when(restTemplate.getForObject(anyString(), eq(NasaAsteroidResponse.class)))
+        when(nasaApiClient.getAsteroidData(asteroidId))
                 .thenReturn(null);
 
         // Act
@@ -222,7 +207,7 @@ class AsteroidServiceImplTest {
         NasaAsteroidResponse mockResponse = new NasaAsteroidResponse();
         mockResponse.setCloseApproachData(new ArrayList<>());
 
-        when(restTemplate.getForObject(anyString(), eq(NasaAsteroidResponse.class)))
+        when(nasaApiClient.getAsteroidData(asteroidId))
                 .thenReturn(mockResponse);
 
         // Act
@@ -234,30 +219,14 @@ class AsteroidServiceImplTest {
     }
 
     @Test
-    void getAsteroidPaths_WithHttpClientErrorException_ShouldThrowNasaApiException() {
-        // Arrange
-        int asteroidId = 123;
-        LocalDate fromDate = LocalDate.of(2020, 1, 1);
-        LocalDate toDate = LocalDate.of(2020, 12, 31);
-
-        when(restTemplate.getForObject(anyString(), eq(NasaAsteroidResponse.class)))
-                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
-
-        // Act & Assert
-        assertThrows(NasaApiException.class, () -> {
-            asteroidService.getAsteroidPaths(asteroidId, fromDate, toDate);
-        });
-    }
-
-    @Test
     void getAsteroidPaths_WithException_ShouldThrowNasaApiException() {
         // Arrange
         int asteroidId = 123;
         LocalDate fromDate = LocalDate.of(2020, 1, 1);
         LocalDate toDate = LocalDate.of(2020, 12, 31);
 
-        when(restTemplate.getForObject(anyString(), eq(NasaAsteroidResponse.class)))
-                .thenThrow(new RuntimeException("RuntimeException"));
+        when(nasaApiClient.getAsteroidData(asteroidId))
+                .thenThrow(new NasaApiException("API error", null));
 
         // Act & Assert
         assertThrows(NasaApiException.class, () -> {
@@ -293,7 +262,7 @@ class AsteroidServiceImplTest {
 
         mockResponse.setCloseApproachData(approaches);
 
-        when(restTemplate.getForObject(anyString(), eq(NasaAsteroidResponse.class)))
+        when(nasaApiClient.getAsteroidData(asteroidId))
                 .thenReturn(mockResponse);
 
         // Act
