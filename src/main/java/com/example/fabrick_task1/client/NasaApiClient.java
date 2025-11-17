@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
@@ -18,7 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class NasaApiClient {
 
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
     private final NasaApiProperties nasaApiProperties;
 
     @Cacheable(value = "asteroidData", key = "#asteroidId")
@@ -33,7 +33,10 @@ public class NasaApiClient {
         log.debug("NASA API URL: {}", url);
 
         try {
-            NasaAsteroidResponse response = restTemplate.getForObject(url, NasaAsteroidResponse.class);
+            NasaAsteroidResponse response = restClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .body(NasaAsteroidResponse.class);
             log.info("Successfully fetched data from NASA API for asteroidId: {}", asteroidId);
             return response;
 
