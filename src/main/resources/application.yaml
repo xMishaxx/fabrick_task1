@@ -22,9 +22,9 @@ application:
 
 logging:
   level:
-    com.example.fabrick_task1: DEBUG
-    org.springframework.web.client: DEBUG
+    com.example.fabrick_task1: INFO
+    org.springframework.web.client: INFO
     org.springframework.cache: TRACE
-    com.github.benmanes.caffeine: DEBUG
+    com.github.benmanes.caffeine: INFO
   pattern:
     level: "%5p [%spring.application.name]"
