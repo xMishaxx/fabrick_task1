@@ -58,6 +58,22 @@ public class AsteroidController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "404",
+                    description = "Not Found - Asteroid with the specified ID does not exist",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "429",
+                    description = "Too Many Requests - NASA API rate limit exceeded",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "502",
                     description = "Bad Gateway - Error communicating with NASA API",
                     content = @Content(
