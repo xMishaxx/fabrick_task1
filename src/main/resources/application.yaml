@@ -1,0 +1,30 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: fabrick_task1
+  main:
+    web-application-type: servlet
+  cache:
+    type: caffeine
+    caffeine:
+      maximum-size: 1000
+      expire-after-write: 86400000 # 24 hours in milliseconds
+
+application:
+  nasa:
+    api:
+      base-url: https://api.nasa.gov/neo/rest/v1/neo
+      api-key: DEMO_KEY #todo: only because it's a public demo api, otherwise it must be configured in a secure place
+
+logging:
+  level:
+    com.example.fabrick_task1: INFO
+    org.springframework.web.client: INFO
+    org.springframework.cache: TRACE
+    com.github.benmanes.caffeine: INFO
+  pattern:
+    level: "%5p [%spring.application.name]"
